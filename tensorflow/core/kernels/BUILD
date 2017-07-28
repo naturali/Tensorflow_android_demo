@@ -4219,9 +4219,18 @@ filegroup(
         ":android_extended_ops_group1",
         ":android_extended_ops_group2",
         ":android_quantized_ops",
+        ":android_fft_op",
     ],
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "android_fft_op",
+    srcs = [
+        "fft_ops.cc",
+    ],
+)
+
 
 filegroup(
     name = "android_extended_ops_headers",
