@@ -75,7 +75,7 @@ android_binary(
     inline_constants = 1,
     manifest = "AndroidManifest.xml",
     manifest_merger = "legacy",
-    resource_files = glob(["res/**"]),
+    resource_files = glob(["res/**"],exclude = ["**/.DS_Store"]),
     tags = [
         "manual",
         "notap",
