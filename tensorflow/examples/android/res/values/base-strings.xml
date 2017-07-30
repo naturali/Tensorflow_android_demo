@@ -18,7 +18,7 @@
 <resources>
     <string name="app_name">TensorFlow Demo</string>
     <string name="activity_name_classification">TF Classify</string>
-    <string name="activity_name_streaming">Keyword streaming</string>
+    <string name="activity_name_streaming">Keyword Spotting</string>
     <string name="activity_name_detection">TF Detect</string>
     <string name="activity_name_stylize">TF Stylize</string>
     <string name="activity_name_keyword">Keyword Test</string>

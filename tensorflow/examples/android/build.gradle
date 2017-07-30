@@ -81,7 +81,7 @@ android {
         defaultConfig {
             applicationId = 'com.tensorflow.demo'
             minSdkVersion 21
-            targetSdkVersion 23
+            targetSdkVersion 25
             ndk {
                 abiFilters "${cpuType}"
             }
