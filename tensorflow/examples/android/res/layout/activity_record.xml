@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.tensorflow.demo.RecordingActivity">
+
+    <Button
+        android:id="@+id/record_start"
+        android:layout_width="125dp"
+        android:layout_height="80dp"
+        android:layout_margin="20dp"
+        android:onClick="onClickRecord"
+        android:text="开始监听"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"/>
+
+    <Button
+        android:id="@+id/record_stop"
+        android:layout_width="125dp"
+        android:layout_height="80dp"
+        android:layout_margin="20dp"
+        android:onClick="onClickStopRecord"
+        android:text="结束监听"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"/>
+</LinearLayout>
