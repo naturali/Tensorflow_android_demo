@@ -11,6 +11,8 @@ The android project in tensorflow/tensorflow/example/android
 
 the model is trained with r1.1, the lib used to build android lib is r1.3 (the model can not be restored with r1.3 in python, so you have to do this with r1.1, but it can run on r1.3 based android lib)
 
+Also, to build the .pb graph with python, you have to  modify the RFFT op in c code (updated to r1.3) to enable RFFT on CPU and then compile the tensorflow by yourself.
+
 
 
 the project is build with bazel
