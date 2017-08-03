@@ -140,7 +140,7 @@ public class TensorFlowKeywordSpotting {
 //        }
 //        softmaxList.add(outputs);
 //        float[] concated = util.concatAll(softmaxList);
-        String result = classifier.ctc_decode(outputs, outputs.length / num_classes);
+        String result = classifier.ctc_decode2(outputs, outputs.length / num_classes);
 
         Log.i("STRING RESULT","::"+result);
 

@@ -26,12 +26,13 @@ public class Classifier {
         }
     }
 
+    private int pre_word = -1;
     private int lockout_res = 0;
     private boolean loose = false;
 
     private LinkedList<String> strings = new LinkedList<>();
 
-    public Classifier(int window_size,int num_classes) {
+    public Classifier(int window_size, int num_classes) {
         this.window_size = window_size;
         this.h = num_classes;
         strings.add("");
@@ -39,7 +40,7 @@ public class Classifier {
 
     public String ctc_decode(float[] softmax, int t) {
         LinkedList<tuple> result = new LinkedList<>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         i += lockout_res;
         while (i < t) {
@@ -101,11 +102,39 @@ public class Classifier {
         return s;
     }
 
-    public void clear(){
-        this.lockout_res=0;
+    public String ctc_decode2(float[] softmax, int t) {
+        LinkedList<tuple> result = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < t) {
+//            System.out.println(i);
+            if (util.max(softmax, i * h + 1, i * h + 5) > loose_thres) {
+                int pos = util.argmax(softmax, i * h + 1, i * h + 5, h) + 1;
+                if (pre_word == -1 || pre_word != pos) {
+                    result.add(new tuple(pos, i));
+                }
+                pre_word = pos;
+            } else {
+                pre_word = -1;
+            }
+            i++;
+        }
+        for (tuple tup : result) {
+            sb.append(tup.logit);
+        }
+        String s = strings.getLast() + sb.toString();
+        if (strings.size() == window_size)
+            strings.poll();
+
+        strings.add(s);
+        return s;
+    }
+
+    public void clear() {
+        this.lockout_res = 0;
         this.strings.clear();
         this.strings.add("");
-        this.loose=false;
+        this.loose = false;
     }
 
 }

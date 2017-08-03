@@ -121,7 +121,7 @@ public class RecordingThread {
             int numberOfByte = record.read(audioBuffer, 0, audioBuffer.length);
 //            Log.e("fuck",String.valueOf(numberOfByte));
             float floatValues[] = util.byte2float(audioBuffer);
-            if (util.vad(floatValues, 40)) {
+            if (util.vad(floatValues, 55)) {
                 this.non_speech_count = 0;
             } else {
                 this.non_speech_count += 1;
