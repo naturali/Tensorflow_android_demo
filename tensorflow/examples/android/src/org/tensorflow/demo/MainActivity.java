@@ -1,7 +1,6 @@
 package org.tensorflow.demo;
 
 import android.app.Activity;
-import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class MainActivity extends Activity {
@@ -52,7 +50,7 @@ public class MainActivity extends Activity {
         if (mTester != null) {
             bytes = mTester.startTesting();
             saveData.save(bytes);
-            floats = util.byte2float(bytes);
+            floats = Util.byte2float(bytes);
             Toast.makeText(this, "Start Testing !\n", Toast.LENGTH_SHORT).show();
 //            SoundPool.Builder spb = new SoundPool.Builder();
 //            spb.setMaxStreams(10);
@@ -79,7 +77,6 @@ public class MainActivity extends Activity {
     public void onClickTensorFlow(View v) {
         Log.e("liuziqi", "12345a");
         tensorFlowKeywordSpotting = new TensorFlowKeywordSpotting(getAssets(), MODEL_DIR);
-        tensorFlowKeywordSpotting.test_whole_audio(floats);
         Log.e("liuziqi", "sdlkfjlskd");
     }
 

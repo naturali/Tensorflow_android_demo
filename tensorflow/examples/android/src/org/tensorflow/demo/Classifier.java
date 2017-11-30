@@ -1,140 +1,64 @@
 package org.tensorflow.demo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import android.util.Log;
 
-
-/**
- * Created by liuziqi on 2017/7/29.
- */
 
 public class Classifier {
-    private final float thres = 0.5f;
-    private final float loose_thres = 0.2f;
-    private final int lockout = 3;
-    private final int h;
-    private final int window_size;
+    private final float threshold;
+    private final int maxKeepLength;
+    private final int numClasses;
+    private final char otherWordIdx;
+    private String accumuResult;
 
-    private class tuple {
-        private int logit;
-        private int frame;
+    private int preWord = -1;
 
-        private tuple(int logit, int frame) {
-            this.logit = logit;
-            this.frame = frame;
-        }
+    public Classifier(float threshold, int maxKeepLength, int numClasses, char otherWordIdx) {
+        this.threshold = threshold;
+        this.maxKeepLength = maxKeepLength;
+        this.numClasses = numClasses;
+        this.otherWordIdx = otherWordIdx;
+        this.accumuResult = "";
     }
 
-    private int pre_word = -1;
-    private int lockout_res = 0;
-    private boolean loose = false;
-
-    private LinkedList<String> strings = new LinkedList<>();
-
-    public Classifier(int window_size, int num_classes) {
-        this.window_size = window_size;
-        this.h = num_classes;
-        strings.add("");
-    }
-
-    public String ctc_decode(float[] softmax, int t) {
-        LinkedList<tuple> result = new LinkedList<>();
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        i += lockout_res;
-        while (i < t) {
-//            System.out.println(i);
-            if (loose) {
-//                System.out.println("loose");
-                if (util.max(softmax, i * h + 1, i * h + 5) < loose_thres) {
-                    if (result.getLast().logit != 3) {
-                        i += lockout;
-                        loose = false;
-                        continue;
-                    }
-                } else {
-                    if (softmax[i * h + 3] > loose_thres) {
-                        result.add(new tuple(3, i));
-//                        System.out.println("flag");
-                        i += lockout;
-                        loose = false;
-                        continue;
-                    } else {
-                        int pos = util.argmax(softmax, i * h + 1, i * h + 5, h) + 1;
-                        if (softmax[i * h + pos - 1] > 0.6) {
-                            if (result.getLast().frame + lockout < i) {
-                                result.add(new tuple(pos, i));
-//                                System.out.println("flag");
-                            }
-                        }
-                    }
-                }
-
-            } else {
-                if (util.max(softmax, i * h + 1, i * h + 5) > thres) {
-                    result.add(new tuple(util.argmax(softmax, i * h + 1, i * h + 5, h), i));
-//                    System.out.println("flag");
-                    i += lockout;
-                    if (result.size() >= 3) {
-                        ArrayList<Integer> temp = new ArrayList<>();
-                        for (tuple tup : result) {
-                            temp.add(tup.logit);
-                        }
-                        int[] tempresult = util.toPrimitive(temp.toArray(new Integer[1]));
-                        if (Arrays.equals(tempresult, new int[]{1, 2, 3}))
-                            loose = true;
-                    }
-                    continue;
-                }
-            }
-            i++;
-        }
-        lockout_res = i > t ? i - t : 0;
-        for (tuple tup : result) {
-            sb.append(tup.logit);
-        }
-        String s = strings.getLast() + sb.toString();
-        if (strings.size() == window_size)
-            strings.poll();
-
-        strings.add(s);
-        return s;
-    }
-
-    public String ctc_decode2(float[] softmax, int t) {
-        LinkedList<tuple> result = new LinkedList<>();
+    public String ctcDecode(float[] logit, int t) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < t) {
-//            System.out.println(i);
-            if (util.max(softmax, i * h + 1, i * h + 5) > loose_thres) {
-                int pos = util.argmax(softmax, i * h + 1, i * h + 5, h) + 1;
-                if (pre_word == -1 || pre_word != pos) {
-                    result.add(new tuple(pos, i));
+            // do softmax in place
+            Util.softmax(logit, i * numClasses, (i + 1) * numClasses);
+            // don't consider space 0 and ctc_blank h - 1
+            int pos = Util.argmax(logit, i * numClasses + 1, (i + 1) * numClasses - 1, numClasses);
+            float frame_max = logit[i * numClasses + pos];
+            if (frame_max > threshold) {
+                if (preWord == -1 || preWord != pos) {
+                    sb.append(pos);
                 }
-                pre_word = pos;
+                preWord = pos;
             } else {
-                pre_word = -1;
+                preWord = -1;
             }
-            i++;
+            i ++;
         }
-        for (tuple tup : result) {
-            sb.append(tup.logit);
-        }
-        String s = strings.getLast() + sb.toString();
-        if (strings.size() == window_size)
-            strings.poll();
 
-        strings.add(s);
-        return s;
+        // to avoid repeat keywords
+        int j = 0;
+        if (accumuResult.length() > 0 && sb.length() > 0) {
+            while (accumuResult.charAt(accumuResult.length() - 1) != otherWordIdx &&
+                    j < sb.length() &&
+                    sb.charAt(j) == accumuResult.charAt(accumuResult.length() - 1)) {
+                j ++;
+            }
+        }
+        Log.i("res!!", "" + sb);
+        accumuResult = accumuResult + sb.substring(j);
+        if (accumuResult.length() > maxKeepLength)
+            accumuResult = accumuResult.substring(accumuResult.length() - maxKeepLength);
+
+        return accumuResult;
     }
 
     public void clear() {
-        this.lockout_res = 0;
-        this.strings.clear();
-        this.strings.add("");
-        this.loose = false;
+        accumuResult = "";
     }
 
 }
