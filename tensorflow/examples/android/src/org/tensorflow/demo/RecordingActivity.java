@@ -5,11 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-//import mata.audiohelper.R;
 
-/**
- * Created by apple on 7/26/17.
- */
 
 public class RecordingActivity  extends Activity {
     private byte[] recordbytes;

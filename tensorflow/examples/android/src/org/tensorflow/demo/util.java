@@ -5,19 +5,11 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.lang.Math;
 
 
-/**
- * Created by liuziqi on 2017/7/26.
- */
-
-public class util {
-    static public float[] byte2float(byte[] b) {
+public class Util {
+    public static float[] byte2float(byte[] b) {
         byte bLength = 2;
         short[] s = new short[b.length / bLength];
         for (int iLoop = 0; iLoop < s.length; iLoop++) {
@@ -45,12 +37,15 @@ public class util {
         return dst;
     }
 
-    public static float max(float[] ar, int st, int end) {
-        float max = ar[st];
-        for (int i = st + 1; i < end; i++) {
-            max = max > ar[i] ? max : ar[i];
+    public static void softmax(float[] ar, int st, int end) {
+        float expSum = 0.f;
+        for (int i = st; i < end; i ++) {
+
+            expSum += Math.exp(ar[i]);
         }
-        return max;
+        for (int i = st; i < end; i ++) {
+            ar[i] = (float)Math.exp(ar[i]) / expSum;
+        }
     }
 
     public static int argmax(float[] ar, int st, int end, int h) {
@@ -65,44 +60,12 @@ public class util {
         return index % h;
     }
 
-    public static int[] toPrimitive(Integer[] ar) {
-        int[] a = new int[ar.length];
-        for (int i = 0; i < ar.length; i++) {
-            a[i] = ar[i];
+    public static float vad(float[] sig){
+        float sum = 0.f;
+        for(float f:sig) {
+            sum += Math.abs(f);
         }
-        return a;
+        Log.i("sum", String.valueOf(sum));
+        return sum;
     }
-
-    public static float[] concatAll(List<float[]> list) {
-        int len = 0;
-        for (float[] fl : list) {
-            len += fl.length;
-        }
-        float[] concat = new float[len];
-        int pt = 0;
-        for (int i = 0; i < list.size(); i++) {
-            float[] temp = list.get(i);
-            System.arraycopy(temp, 0, concat, pt, temp.length);
-            pt += temp.length;
-        }
-        return concat;
-    }
-
-    public static float[] merge2Arrays(float[] a1, float[] a2) {
-        float[] b = new float[a1.length + a2.length];
-        System.arraycopy(a1, 0, b, 0, a1.length);
-        System.arraycopy(a2, 0, b, a1.length, a2.length);
-        return b;
-    }
-
-    public static boolean vad(float[] sig,float thres){
-        float sum=0.f;
-        for(float f:sig){
-            sum+=Math.abs(f);
-        }
-        Log.i("sum",String.valueOf(sum));
-        return sum>thres;
-    }
-
-
 }
